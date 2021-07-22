@@ -15,6 +15,11 @@
  */
 package com.baidu.fsg.uid.buffer;
 
+import com.baidu.fsg.uid.utils.Assert;
+import com.baidu.fsg.uid.utils.NamingThreadFactory;
+import com.baidu.fsg.uid.utils.PaddedAtomicLong;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,22 +27,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
-
-import com.baidu.fsg.uid.utils.NamingThreadFactory;
-import com.baidu.fsg.uid.utils.PaddedAtomicLong;
-
 /**
  * Represents an executor for padding {@link RingBuffer}<br>
  * There are two kinds of executors: one for scheduled padding, the other for padding immediately.
  * 
  * @author yutianbao
  */
+@Slf4j
 public class BufferPaddingExecutor {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RingBuffer.class);
-
     /** Constants */
     private static final String WORKER_NAME = "RingBuffer-Padding-Worker";
     private static final String SCHEDULE_NAME = "RingBuffer-Padding-Schedule";
@@ -55,6 +52,7 @@ public class BufferPaddingExecutor {
 
     /** Padding immediately by the thread pool */
     private final ExecutorService bufferPadExecutors;
+
     /** Padding schedule thread */
     private final ScheduledExecutorService bufferPadSchedule;
     
@@ -76,7 +74,7 @@ public class BufferPaddingExecutor {
      *
      * @param ringBuffer {@link RingBuffer}
      * @param uidProvider {@link BufferedUidProvider}
-     * @param usingSchedule
+     * @param usingSchedule whether usingSchedule
      */
     public BufferPaddingExecutor(RingBuffer ringBuffer, BufferedUidProvider uidProvider, boolean usingSchedule) {
         this.running = new AtomicBoolean(false);
@@ -101,7 +99,7 @@ public class BufferPaddingExecutor {
      */
     public void start() {
         if (bufferPadSchedule != null) {
-            bufferPadSchedule.scheduleWithFixedDelay(() -> paddingBuffer(), scheduleInterval, scheduleInterval, TimeUnit.SECONDS);
+            bufferPadSchedule.scheduleWithFixedDelay(this::paddingBuffer, scheduleInterval, scheduleInterval, TimeUnit.SECONDS);
         }
     }
 
@@ -112,7 +110,6 @@ public class BufferPaddingExecutor {
         if (!bufferPadExecutors.isShutdown()) {
             bufferPadExecutors.shutdownNow();
         }
-
         if (bufferPadSchedule != null && !bufferPadSchedule.isShutdown()) {
             bufferPadSchedule.shutdownNow();
         }
@@ -121,7 +118,7 @@ public class BufferPaddingExecutor {
     /**
      * Whether is padding
      *
-     * @return
+     * @return whether is padding
      */
     public boolean isRunning() {
         return running.get();
@@ -138,11 +135,11 @@ public class BufferPaddingExecutor {
      * Padding buffer fill the slots until to catch the cursor
      */
     public void paddingBuffer() {
-        LOGGER.info("Ready to padding buffer lastSecond:{}. {}", lastSecond.get(), ringBuffer);
+        log.info("Ready to padding buffer lastSecond:{}. {}", lastSecond.get(), ringBuffer);
 
         // is still running
         if (!running.compareAndSet(false, true)) {
-            LOGGER.info("Padding buffer is still running. {}", ringBuffer);
+            log.info("Padding buffer is still running. {}", ringBuffer);
             return;
         }
 
@@ -160,7 +157,7 @@ public class BufferPaddingExecutor {
 
         // not running now
         running.compareAndSet(true, false);
-        LOGGER.info("End to padding buffer lastSecond:{}. {}", lastSecond.get(), ringBuffer);
+        log.info("End to padding buffer lastSecond:{}. {}", lastSecond.get(), ringBuffer);
     }
 
     /**
@@ -170,5 +167,4 @@ public class BufferPaddingExecutor {
         Assert.isTrue(scheduleInterval > 0, "Schedule interval must positive!");
         this.scheduleInterval = scheduleInterval;
     }
-    
 }

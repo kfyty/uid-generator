@@ -15,19 +15,17 @@
  */
 package com.baidu.fsg.uid.impl;
 
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-
 import com.baidu.fsg.uid.BitsAllocator;
 import com.baidu.fsg.uid.UidGenerator;
 import com.baidu.fsg.uid.exception.UidGenerateException;
 import com.baidu.fsg.uid.utils.DateUtils;
 import com.baidu.fsg.uid.worker.WorkerIdAssigner;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
+import javax.annotation.PostConstruct;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Represents an implementation of {@link UidGenerator}
@@ -58,9 +56,8 @@ import com.baidu.fsg.uid.worker.WorkerIdAssigner;
  *
  * @author yutianbao
  */
-public class DefaultUidGenerator implements UidGenerator, InitializingBean {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultUidGenerator.class);
-
+@Slf4j
+public class DefaultUidGenerator implements UidGenerator {
     /** Bits allocate */
     protected int timeBits = 28;
     protected int workerBits = 22;
@@ -81,8 +78,8 @@ public class DefaultUidGenerator implements UidGenerator, InitializingBean {
     /** Spring property */
     protected WorkerIdAssigner workerIdAssigner;
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
+    @PostConstruct
+    public void afterPropertiesSet() {
         // initialize bits allocator
         bitsAllocator = new BitsAllocator(timeBits, workerBits, seqBits);
 
@@ -91,8 +88,7 @@ public class DefaultUidGenerator implements UidGenerator, InitializingBean {
         if (workerId > bitsAllocator.getMaxWorkerId()) {
             throw new RuntimeException("Worker id " + workerId + " exceeds the max " + bitsAllocator.getMaxWorkerId());
         }
-
-        LOGGER.info("Initialized bits(1, {}, {}, {}) for workerID:{}", timeBits, workerBits, seqBits, workerId);
+        log.info("Initialized bits(1, {}, {}, {}) for workerID:{}", timeBits, workerBits, seqBits, workerId);
     }
 
     @Override
@@ -100,7 +96,7 @@ public class DefaultUidGenerator implements UidGenerator, InitializingBean {
         try {
             return nextId();
         } catch (Exception e) {
-            LOGGER.error("Generate unique id exception. ", e);
+            log.error("Generate unique id exception. ", e);
             throw new UidGenerateException(e);
         }
     }
@@ -168,7 +164,6 @@ public class DefaultUidGenerator implements UidGenerator, InitializingBean {
         while (timestamp <= lastTimestamp) {
             timestamp = getCurrentSecond();
         }
-
         return timestamp;
     }
 
@@ -180,7 +175,6 @@ public class DefaultUidGenerator implements UidGenerator, InitializingBean {
         if (currentSecond - epochSeconds > bitsAllocator.getMaxDeltaSeconds()) {
             throw new UidGenerateException("Timestamp bits is exhausted. Refusing UID generate. Now: " + currentSecond);
         }
-
         return currentSecond;
     }
 

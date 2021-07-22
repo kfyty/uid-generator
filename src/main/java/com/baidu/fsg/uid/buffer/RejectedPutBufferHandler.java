@@ -23,12 +23,11 @@ package com.baidu.fsg.uid.buffer;
  */
 @FunctionalInterface
 public interface RejectedPutBufferHandler {
-
     /**
      * Reject put buffer request
      * 
-     * @param ringBuffer
-     * @param uid
+     * @param ringBuffer ringBuffer
+     * @param uid uid
      */
     void rejectPutBuffer(RingBuffer ringBuffer, long uid);
 }

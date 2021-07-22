@@ -26,7 +26,6 @@ import java.util.Enumeration;
  * @author yutianbao
  */
 public abstract class NetUtils {
-
     /**
      * Pre-loaded local address
      */
@@ -55,7 +54,6 @@ public abstract class NetUtils {
             if (ni.isLoopback()) {
                 continue;
             }
-
             Enumeration<InetAddress> addressEnumeration = ni.getInetAddresses();
             while (addressEnumeration.hasMoreElements()) {
                 InetAddress address = addressEnumeration.nextElement();
@@ -64,11 +62,9 @@ public abstract class NetUtils {
                 if (address.isLinkLocalAddress() || address.isLoopbackAddress() || address.isAnyLocalAddress()) {
                     continue;
                 }
-
                 return address;
             }
         }
-
         throw new RuntimeException("No validated local address!");
     }
 
@@ -80,5 +76,4 @@ public abstract class NetUtils {
     public static String getLocalAddress() {
         return localAddress.getHostAddress();
     }
-
 }

@@ -23,11 +23,10 @@ package com.baidu.fsg.uid.buffer;
  */
 @FunctionalInterface
 public interface RejectedTakeBufferHandler {
-
     /**
      * Reject take buffer request
      * 
-     * @param ringBuffer
+     * @param ringBuffer ringBuffer
      */
     void rejectTakeBuffer(RingBuffer ringBuffer);
 }

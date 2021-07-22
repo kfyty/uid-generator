@@ -15,9 +15,9 @@
  */
 package com.baidu.fsg.uid;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
-import org.springframework.util.Assert;
+import com.baidu.fsg.uid.utils.Assert;
+import lombok.Getter;
+import lombok.ToString;
 
 /**
  * Allocate 64 bits for the UID(long)<br>
@@ -25,6 +25,8 @@ import org.springframework.util.Assert;
  * 
  * @author yutianbao
  */
+@Getter
+@ToString
 public class BitsAllocator {
     /**
      * Total 64 bits
@@ -34,7 +36,7 @@ public class BitsAllocator {
     /**
      * Bits for [sign-> second-> workId-> sequence]
      */
-    private int signBits = 1;
+    private final int signBits = 1;
     private final int timestampBits;
     private final int workerIdBits;
     private final int sequenceBits;
@@ -80,57 +82,12 @@ public class BitsAllocator {
      * Allocate bits for UID according to delta seconds & workerId & sequence<br>
      * <b>Note that: </b>The highest bit will always be 0 for sign
      * 
-     * @param deltaSeconds
-     * @param workerId
-     * @param sequence
-     * @return
+     * @param deltaSeconds deltaSeconds
+     * @param workerId workerId
+     * @param sequence sequence
+     * @return allocate
      */
     public long allocate(long deltaSeconds, long workerId, long sequence) {
         return (deltaSeconds << timestampShift) | (workerId << workerIdShift) | sequence;
     }
-    
-    /**
-     * Getters
-     */
-    public int getSignBits() {
-        return signBits;
-    }
-
-    public int getTimestampBits() {
-        return timestampBits;
-    }
-
-    public int getWorkerIdBits() {
-        return workerIdBits;
-    }
-
-    public int getSequenceBits() {
-        return sequenceBits;
-    }
-
-    public long getMaxDeltaSeconds() {
-        return maxDeltaSeconds;
-    }
-
-    public long getMaxWorkerId() {
-        return maxWorkerId;
-    }
-
-    public long getMaxSequence() {
-        return maxSequence;
-    }
-
-    public int getTimestampShift() {
-        return timestampShift;
-    }
-
-    public int getWorkerIdShift() {
-        return workerIdShift;
-    }
-    
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
-    }
-    
 }

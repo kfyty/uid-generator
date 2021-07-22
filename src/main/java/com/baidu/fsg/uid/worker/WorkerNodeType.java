@@ -16,6 +16,8 @@
 package com.baidu.fsg.uid.worker;
 
 import com.baidu.fsg.uid.utils.ValuedEnum;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 
 /**
  * WorkerNodeType
@@ -24,25 +26,19 @@ import com.baidu.fsg.uid.utils.ValuedEnum;
  * 
  * @author yutianbao
  */
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum WorkerNodeType implements ValuedEnum<Integer> {
-
-    CONTAINER(1), ACTUAL(2);
+    CONTAINER(1),
+    ACTUAL(2),
+    ;
 
     /**
      * Lock type
      */
     private final Integer type;
 
-    /**
-     * Constructor with field of type
-     */
-    private WorkerNodeType(Integer type) {
-        this.type = type;
-    }
-
     @Override
     public Integer value() {
         return type;
     }
-
 }

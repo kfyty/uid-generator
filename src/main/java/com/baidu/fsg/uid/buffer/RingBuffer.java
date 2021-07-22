@@ -15,13 +15,11 @@
  */
 package com.baidu.fsg.uid.buffer;
 
-import java.util.concurrent.atomic.AtomicLong;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
-
+import com.baidu.fsg.uid.utils.Assert;
 import com.baidu.fsg.uid.utils.PaddedAtomicLong;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Represents a ring buffer based on array.<br>
@@ -36,9 +34,8 @@ import com.baidu.fsg.uid.utils.PaddedAtomicLong;
  * 
  * @author yutianbao
  */
+@Slf4j
 public class RingBuffer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RingBuffer.class);
-
     /** Constants */
     private static final int START_POINT = -1;
     private static final long CAN_PUT_FLAG = 0L;
@@ -105,7 +102,7 @@ public class RingBuffer {
      * <b>Note that: </b> It is recommended to put UID in a serialize way, cause we once batch generate a series UIDs and put
      * the one by one into the buffer, so it is unnecessary put in multi-threads
      *
-     * @param uid
+     * @param uid uid
      * @return false means that the buffer is full, apply {@link RejectedPutBufferHandler}
      */
     public synchronized boolean put(long uid) {
@@ -159,7 +156,7 @@ public class RingBuffer {
         // trigger padding in an async-mode if reach the threshold
         long currentTail = tail.get();
         if (currentTail - nextCursor < paddingThreshold) {
-            LOGGER.info("Reach the padding threshold:{}. tail:{}, cursor:{}, rest:{}", paddingThreshold, currentTail,
+            log.info("Reach the padding threshold:{}. tail:{}, cursor:{}, rest:{}", paddingThreshold, currentTail,
                     nextCursor, currentTail - nextCursor);
             bufferPaddingExecutor.asyncPadding();
         }
@@ -194,14 +191,14 @@ public class RingBuffer {
      * Discard policy for {@link RejectedPutBufferHandler}, we just do logging
      */
     protected void discardPutBuffer(RingBuffer ringBuffer, long uid) {
-        LOGGER.warn("Rejected putting buffer for uid:{}. {}", uid, ringBuffer);
+        log.warn("Rejected putting buffer for uid:{}. {}", uid, ringBuffer);
     }
     
     /**
      * Policy for {@link RejectedTakeBufferHandler}, throws {@link RuntimeException} after logging 
      */
     protected void exceptionRejectedTakeBuffer(RingBuffer ringBuffer) {
-        LOGGER.warn("Rejected take buffer. {}", ringBuffer);
+        log.warn("Rejected take buffer. {}", ringBuffer);
         throw new RuntimeException("Rejected take buffer. " + ringBuffer);
     }
     
@@ -213,7 +210,6 @@ public class RingBuffer {
         for (int i = 0; i < bufferSize; i++) {
             flags[i] = new PaddedAtomicLong(CAN_PUT_FLAG);
         }
-        
         return flags;
     }
 
@@ -249,13 +245,9 @@ public class RingBuffer {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("RingBuffer [bufferSize=").append(bufferSize)
-               .append(", tail=").append(tail)
-               .append(", cursor=").append(cursor)
-               .append(", paddingThreshold=").append(paddingThreshold).append("]");
-        
-        return builder.toString();
+        return "RingBuffer [bufferSize=" + bufferSize +
+                ", tail=" + tail +
+                ", cursor=" + cursor +
+                ", paddingThreshold=" + paddingThreshold + "]";
     }
-
 }

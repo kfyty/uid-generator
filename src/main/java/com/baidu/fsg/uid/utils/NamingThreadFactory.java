@@ -15,15 +15,16 @@
  */
 package com.baidu.fsg.uid.utils;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.apache.commons.lang.ClassUtils;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Named thread in ThreadFactory. If there is no specified name for thread, it
@@ -31,21 +32,26 @@ import org.slf4j.LoggerFactory;
  * 
  * @author yutianbao
  */
+@Slf4j
 public class NamingThreadFactory implements ThreadFactory {
-    private static final Logger LOGGER = LoggerFactory.getLogger(NamingThreadFactory.class);
-
     /**
      * Thread name pre
      */
+    @Getter @Setter
     private String name;
+
     /**
      * Is daemon thread
      */
+    @Getter @Setter
     private boolean daemon;
+
     /**
      * UncaughtExceptionHandler
      */
+    @Getter @Setter
     private UncaughtExceptionHandler uncaughtExceptionHandler;
+
     /**
      * Sequences for multi thread name prefix
      */
@@ -92,7 +98,7 @@ public class NamingThreadFactory implements ThreadFactory {
         } else {
             thread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
                 public void uncaughtException(Thread t, Throwable e) {
-                    LOGGER.error("unhandled exception in thread: " + t.getId() + ":" + t.getName(), e);
+                    log.error("unhandled exception in thread: " + t.getId() + ":" + t.getName(), e);
                 }
             });
         }
@@ -103,14 +109,14 @@ public class NamingThreadFactory implements ThreadFactory {
     /**
      * Get the method invoker's class name
      * 
-     * @param depth
-     * @return
+     * @param depth depth
+     * @return method
      */
     private String getInvoker(int depth) {
         Exception e = new Exception();
-        StackTraceElement[] stes = e.getStackTrace();
-        if (stes.length > depth) {
-            return ClassUtils.getShortClassName(stes[depth].getClassName());
+        StackTraceElement[] stackTraceElements = e.getStackTrace();
+        if (stackTraceElements.length > depth) {
+            return ClassUtils.getShortClassName(stackTraceElements[depth].getClassName());
         }
         return getClass().getSimpleName();
     }
@@ -118,8 +124,8 @@ public class NamingThreadFactory implements ThreadFactory {
     /**
      * Get sequence for different naming prefix
      * 
-     * @param invoker
-     * @return
+     * @param invoker invoker
+     * @return sequence
      */
     private long getSequence(String invoker) {
         AtomicLong r = this.sequences.get(invoker);
@@ -130,35 +136,6 @@ public class NamingThreadFactory implements ThreadFactory {
                 r = previous;
             }
         }
-
         return r.incrementAndGet();
     }
-
-    /**
-     * Getters & Setters
-     */
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public boolean isDaemon() {
-        return daemon;
-    }
-
-    public void setDaemon(boolean daemon) {
-        this.daemon = daemon;
-    }
-
-    public UncaughtExceptionHandler getUncaughtExceptionHandler() {
-        return uncaughtExceptionHandler;
-    }
-
-    public void setUncaughtExceptionHandler(UncaughtExceptionHandler handler) {
-        this.uncaughtExceptionHandler = handler;
-    }
-
 }

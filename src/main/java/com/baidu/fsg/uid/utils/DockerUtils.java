@@ -15,18 +15,16 @@
  */
 package com.baidu.fsg.uid.utils;
 
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * DockerUtils
  * 
  * @author yutianbao
  */
+@Slf4j
 public abstract class DockerUtils {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DockerUtils.class);
-
     /** Environment param keys */
     private static final String ENV_KEY_HOST = "JPAAS_HOST";
     private static final String ENV_KEY_PORT = "JPAAS_HTTP_PORT";
@@ -64,7 +62,7 @@ public abstract class DockerUtils {
     /**
      * Whether a docker
      * 
-     * @return
+     * @return whether a docker
      */
     public static boolean isDocker() {
         return IS_DOCKER;
@@ -95,10 +93,9 @@ public abstract class DockerUtils {
             IS_DOCKER = false;
 
         } else {
-            LOGGER.error("Missing host or port from env for Docker. host:{}, port:{}", DOCKER_HOST, DOCKER_PORT);
+            log.error("Missing host or port from env for Docker. host:{}, port:{}", DOCKER_HOST, DOCKER_PORT);
             throw new RuntimeException(
                     "Missing host or port from env for Docker. host:" + DOCKER_HOST + ", port:" + DOCKER_PORT);
         }
     }
-
 }
