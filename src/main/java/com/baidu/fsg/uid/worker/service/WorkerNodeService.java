@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.fsg.uid.worker.dao;
+package com.baidu.fsg.uid.worker.service;
 
 import com.baidu.fsg.uid.worker.entity.WorkerNodeEntity;
 
@@ -25,7 +25,7 @@ import com.baidu.fsg.uid.worker.entity.WorkerNodeEntity;
 public interface WorkerNodeService {
     /**
      * Add {@link WorkerNodeEntity}
-     * 
+     *
      * @param workerNodeEntity WorkerNode
      */
     int addWorkNode(WorkerNodeEntity workerNodeEntity);

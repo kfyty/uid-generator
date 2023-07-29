@@ -181,58 +181,59 @@ Copy beans of CachedUidGenerator to 'test/resources/uid/cached-uid-spring.xml'.
 
 #### Mybatis config
 [mybatis-spring.xml](src/test/resources/uid/mybatis-spring.xml) shows as below:
+
 ```xml
 <!-- Spring annotation scan -->
-<context:component-scan base-package="com.baidu.fsg.uid" />
+<context:component-scan base-package="com.baidu.fsg.uid"/>
 
 <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-    <property name="dataSource" ref="dataSource" />
-    <property name="mapperLocations" value="classpath:/META-INF/mybatis/mapper/M_WORKER*.xml" />
+<property name="dataSource" ref="dataSource"/>
+<property name="mapperLocations" value="classpath:/META-INF/mybatis/mapper/M_WORKER*.xml"/>
 </bean>
 
-<!-- transaction -->
-<tx:annotation-driven transaction-manager="transactionManager" order="1" />
+        <!-- transaction -->
+<tx:annotation-driven transaction-manager="transactionManager" order="1"/>
 
 <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-	<property name="dataSource" ref="dataSource" />
+<property name="dataSource" ref="dataSource"/>
 </bean>
 
-<!-- Mybatis Mapper scan -->
+        <!-- Mybatis Mapper scan -->
 <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-	<property name="annotationClass" value="org.springframework.stereotype.Repository" />
-	<property name="basePackage" value="com.baidu.fsg.uid.worker.dao" />
-	<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+<property name="annotationClass" value="org.springframework.stereotype.Repository"/>
+<property name="basePackage" value="com.baidu.fsg.uid.worker.service"/>
+<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
 </bean>
 
-<!-- datasource config -->
+        <!-- datasource config -->
 <bean id="dataSource" parent="abstractDataSource">
-	<property name="driverClassName" value="${mysql.driver}" />
-	<property name="maxActive" value="${jdbc.maxActive}" />
-	<property name="url" value="${jdbc.url}" />
-	<property name="username" value="${jdbc.username}" />
-	<property name="password" value="${jdbc.password}" />
+<property name="driverClassName" value="${mysql.driver}"/>
+<property name="maxActive" value="${jdbc.maxActive}"/>
+<property name="url" value="${jdbc.url}"/>
+<property name="username" value="${jdbc.username}"/>
+<property name="password" value="${jdbc.password}"/>
 </bean>
 
 <bean id="abstractDataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
-	<property name="filters" value="${datasource.filters}" />
-	<property name="defaultAutoCommit" value="${datasource.defaultAutoCommit}" />
-	<property name="initialSize" value="${datasource.initialSize}" />
-	<property name="minIdle" value="${datasource.minIdle}" />
-	<property name="maxWait" value="${datasource.maxWait}" />
-	<property name="testWhileIdle" value="${datasource.testWhileIdle}" />
-	<property name="testOnBorrow" value="${datasource.testOnBorrow}" />
-	<property name="testOnReturn" value="${datasource.testOnReturn}" />
-	<property name="validationQuery" value="${datasource.validationQuery}" />
-	<property name="timeBetweenEvictionRunsMillis" value="${datasource.timeBetweenEvictionRunsMillis}" />
-	<property name="minEvictableIdleTimeMillis" value="${datasource.minEvictableIdleTimeMillis}" />
-	<property name="logAbandoned" value="${datasource.logAbandoned}" />
-	<property name="removeAbandoned" value="${datasource.removeAbandoned}" />
-	<property name="removeAbandonedTimeout" value="${datasource.removeAbandonedTimeout}" />
+<property name="filters" value="${datasource.filters}"/>
+<property name="defaultAutoCommit" value="${datasource.defaultAutoCommit}"/>
+<property name="initialSize" value="${datasource.initialSize}"/>
+<property name="minIdle" value="${datasource.minIdle}"/>
+<property name="maxWait" value="${datasource.maxWait}"/>
+<property name="testWhileIdle" value="${datasource.testWhileIdle}"/>
+<property name="testOnBorrow" value="${datasource.testOnBorrow}"/>
+<property name="testOnReturn" value="${datasource.testOnReturn}"/>
+<property name="validationQuery" value="${datasource.validationQuery}"/>
+<property name="timeBetweenEvictionRunsMillis" value="${datasource.timeBetweenEvictionRunsMillis}"/>
+<property name="minEvictableIdleTimeMillis" value="${datasource.minEvictableIdleTimeMillis}"/>
+<property name="logAbandoned" value="${datasource.logAbandoned}"/>
+<property name="removeAbandoned" value="${datasource.removeAbandoned}"/>
+<property name="removeAbandonedTimeout" value="${datasource.removeAbandonedTimeout}"/>
 </bean>
 
 <bean id="batchSqlSession" class="org.mybatis.spring.SqlSessionTemplate">
-	<constructor-arg index="0" ref="sqlSessionFactory" />
-	<constructor-arg index="1" value="BATCH" />
+<constructor-arg index="0" ref="sqlSessionFactory"/>
+<constructor-arg index="1" value="BATCH"/>
 </bean>
 ```
 

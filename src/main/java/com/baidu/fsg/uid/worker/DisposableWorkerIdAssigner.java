@@ -17,7 +17,7 @@ package com.baidu.fsg.uid.worker;
 
 import com.baidu.fsg.uid.utils.DockerUtils;
 import com.baidu.fsg.uid.utils.NetUtils;
-import com.baidu.fsg.uid.worker.dao.WorkerNodeService;
+import com.baidu.fsg.uid.worker.service.WorkerNodeService;
 import com.baidu.fsg.uid.worker.entity.WorkerNodeEntity;
 import lombok.extern.slf4j.Slf4j;
 
