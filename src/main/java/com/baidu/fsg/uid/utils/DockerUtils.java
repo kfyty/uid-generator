@@ -16,11 +16,10 @@
 package com.baidu.fsg.uid.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * DockerUtils
- * 
+ *
  * @author yutianbao
  */
 @Slf4j
@@ -43,7 +42,7 @@ public abstract class DockerUtils {
 
     /**
      * Retrieve docker host
-     * 
+     *
      * @return empty string if not a docker
      */
     public static String getDockerHost() {
@@ -52,7 +51,7 @@ public abstract class DockerUtils {
 
     /**
      * Retrieve docker port
-     * 
+     *
      * @return empty string if not a docker
      */
     public static String getDockerPort() {
@@ -61,7 +60,7 @@ public abstract class DockerUtils {
 
     /**
      * Whether a docker
-     * 
+     *
      * @return whether a docker
      */
     public static boolean isDocker() {

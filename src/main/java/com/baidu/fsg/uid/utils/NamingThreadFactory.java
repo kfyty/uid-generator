@@ -18,8 +18,6 @@ package com.baidu.fsg.uid.utils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ClassUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,7 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Named thread in ThreadFactory. If there is no specified name for thread, it
  * will auto detect using the invoker classname instead.
- * 
+ *
  * @author yutianbao
  */
 @Slf4j
@@ -76,7 +74,7 @@ public class NamingThreadFactory implements ThreadFactory {
         this.name = name;
         this.daemon = daemon;
         this.uncaughtExceptionHandler = handler;
-        this.sequences = new ConcurrentHashMap<String, AtomicLong>();
+        this.sequences = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -108,7 +106,7 @@ public class NamingThreadFactory implements ThreadFactory {
 
     /**
      * Get the method invoker's class name
-     * 
+     *
      * @param depth depth
      * @return method
      */
@@ -116,14 +114,14 @@ public class NamingThreadFactory implements ThreadFactory {
         Exception e = new Exception();
         StackTraceElement[] stackTraceElements = e.getStackTrace();
         if (stackTraceElements.length > depth) {
-            return ClassUtils.getShortClassName(stackTraceElements[depth].getClassName());
+            return com.baidu.fsg.uid.utils.StringUtils.getShortClassName(stackTraceElements[depth].getClassName());
         }
         return getClass().getSimpleName();
     }
 
     /**
      * Get sequence for different naming prefix
-     * 
+     *
      * @param invoker invoker
      * @return sequence
      */

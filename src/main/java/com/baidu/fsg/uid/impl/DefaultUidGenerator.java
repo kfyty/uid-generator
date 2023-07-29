@@ -19,9 +19,9 @@ import com.baidu.fsg.uid.BitsAllocator;
 import com.baidu.fsg.uid.UidGenerator;
 import com.baidu.fsg.uid.exception.UidGenerateException;
 import com.baidu.fsg.uid.utils.DateUtils;
+import com.baidu.fsg.uid.utils.StringUtils;
 import com.baidu.fsg.uid.worker.WorkerIdAssigner;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.Date;

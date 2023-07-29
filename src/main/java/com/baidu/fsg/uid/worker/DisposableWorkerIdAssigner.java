@@ -20,16 +20,15 @@ import com.baidu.fsg.uid.utils.NetUtils;
 import com.baidu.fsg.uid.worker.dao.WorkerNodeService;
 import com.baidu.fsg.uid.worker.entity.WorkerNodeEntity;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomUtils;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Represents an implementation of {@link WorkerIdAssigner}, 
+ * Represents an implementation of {@link WorkerIdAssigner},
  * the worker id will be discarded after assigned to the UidGenerator
- * 
+ *
  * @author yutianbao
  */
 @Slf4j
@@ -41,10 +40,9 @@ public class DisposableWorkerIdAssigner implements WorkerIdAssigner {
      * Assign worker id base on database.<p>
      * If there is host name & port in the environment, we considered that the node runs in Docker container<br>
      * Otherwise, the node runs on an actual machine.
-     * 
+     *
      * @return assigned worker id
      */
-    @Transactional("transactionManager")
     public long assignWorkerId() {
         // build worker node entity
         WorkerNodeEntity workerNodeEntity = buildWorkerNode();
@@ -69,7 +67,7 @@ public class DisposableWorkerIdAssigner implements WorkerIdAssigner {
         } else {
             workerNodeEntity.setType(WorkerNodeType.ACTUAL.value());
             workerNodeEntity.setHost(NetUtils.getLocalAddress());
-            workerNodeEntity.setPort(System.currentTimeMillis() + "-" + RandomUtils.nextInt(0, 100000));
+            workerNodeEntity.setPort(System.currentTimeMillis() + "-" + ThreadLocalRandom.current().nextInt(0, 100000));
         }
         workerNodeEntity.setCreated(new Date());
         return workerNodeEntity;

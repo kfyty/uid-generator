@@ -15,10 +15,9 @@
  */
 package com.baidu.fsg.uid.utils;
 
-import org.apache.commons.lang3.time.DateFormatUtils;
-
 import java.text.ParseException;
-import java.util.Calendar;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -26,14 +25,13 @@ import java.util.Date;
  *
  * @author yutianbao
  */
-public abstract class DateUtils extends org.apache.commons.lang3.time.DateUtils {
+public abstract class DateUtils {
     /**
      * Patterns
      */
     public static final String DAY_PATTERN = "yyyy-MM-dd";
+
     public static final String DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
-    public static final String DATETIME_MS_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS";
-    public static final Date DEFAULT_DATE = DateUtils.parseByDayPattern("1970-01-01");
 
     /**
      * Parse date by 'yyyy-MM-dd' pattern
@@ -46,19 +44,9 @@ public abstract class DateUtils extends org.apache.commons.lang3.time.DateUtils 
     }
 
     /**
-     * Parse date by 'yyyy-MM-dd HH:mm:ss' pattern
-     *
-     * @param str str
-     * @return date
-     */
-    public static Date parseByDateTimePattern(String str) {
-        return parseDate(str, DATETIME_PATTERN);
-    }
-
-    /**
      * Parse date without Checked exception
      *
-     * @param str str
+     * @param str     str
      * @param pattern pattern
      * @return date
      */
@@ -71,47 +59,76 @@ public abstract class DateUtils extends org.apache.commons.lang3.time.DateUtils 
     }
 
     /**
-     * Format date into string
-     *
-     * @param date date
-     * @param pattern pattern
-     * @return format date
-     */
-    public static String formatDate(Date date, String pattern) {
-        return DateFormatUtils.format(date, pattern);
-    }
-
-    /**
-     * Format date by 'yyyy-MM-dd' pattern
-     *
-     * @param date date
-     * @return format date
-     */
-    public static String formatByDayPattern(Date date) {
-        if (date != null) {
-            return DateFormatUtils.format(date, DAY_PATTERN);
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * Format date by 'yyyy-MM-dd HH:mm:ss' pattern
      *
      * @param date date
      * @return format date
      */
     public static String formatByDateTimePattern(Date date) {
-        return DateFormatUtils.format(date, DATETIME_PATTERN);
+        return new SimpleDateFormat(DATETIME_PATTERN).format(date);
     }
 
-    /**
-     * Get current day using format date by 'yyyy-MM-dd HH:mm:ss' pattern
-     *
-     * @return format date
-     */
-    public static String getCurrentDayByDayPattern() {
-        Calendar cal = Calendar.getInstance();
-        return formatByDayPattern(cal.getTime());
+    public static Date parseDate(String str, String[] parsePatterns) throws ParseException {
+        return parseDateWithLeniency(str, parsePatterns, true);
+    }
+
+    private static Date parseDateWithLeniency(String str, String[] parsePatterns, boolean lenient) throws ParseException {
+        if (str == null || parsePatterns == null) {
+            throw new IllegalArgumentException("Date and Patterns must not be null");
+        }
+
+        SimpleDateFormat parser = new SimpleDateFormat();
+        parser.setLenient(lenient);
+        ParsePosition pos = new ParsePosition(0);
+        for (String parsePattern : parsePatterns) {
+
+            String pattern = parsePattern;
+
+            // LANG-530 - need to make sure 'ZZ' output doesn't get passed to SimpleDateFormat
+            if (parsePattern.endsWith("ZZ")) {
+                pattern = pattern.substring(0, pattern.length() - 1);
+            }
+
+            parser.applyPattern(pattern);
+            pos.setIndex(0);
+
+            String str2 = str;
+            // LANG-530 - need to make sure 'ZZ' output doesn't hit SimpleDateFormat as it will ParseException
+            if (parsePattern.endsWith("ZZ")) {
+                int signIdx = indexOfSignChars(str2, 0);
+                while (signIdx >= 0) {
+                    str2 = reformatTimezone(str2, signIdx);
+                    signIdx = indexOfSignChars(str2, ++signIdx);
+                }
+            }
+
+            Date date = parser.parse(str2, pos);
+            if (date != null && pos.getIndex() == str2.length()) {
+                return date;
+            }
+        }
+        throw new ParseException("Unable to parse the date: " + str, -1);
+    }
+
+    private static int indexOfSignChars(String str, int startPos) {
+        int idx = str.indexOf('+', startPos);
+        if (idx < 0) {
+            idx = str.indexOf('-', startPos);
+        }
+        return idx;
+    }
+
+    private static String reformatTimezone(String str, int signIdx) {
+        String str2 = str;
+        if (signIdx >= 0 &&
+                signIdx + 5 < str.length() &&
+                Character.isDigit(str.charAt(signIdx + 1)) &&
+                Character.isDigit(str.charAt(signIdx + 2)) &&
+                str.charAt(signIdx + 3) == ':' &&
+                Character.isDigit(str.charAt(signIdx + 4)) &&
+                Character.isDigit(str.charAt(signIdx + 5))) {
+            str2 = str.substring(0, signIdx + 3) + str.substring(signIdx + 4);
+        }
+        return str2;
     }
 }
