@@ -79,6 +79,7 @@ public class DefaultUidGenerator implements UidGenerator {
     protected WorkerIdAssigner workerIdAssigner;
 
     @PostConstruct
+    @jakarta.annotation.PostConstruct
     public void afterPropertiesSet() {
         // initialize bits allocator
         bitsAllocator = new BitsAllocator(timeBits, workerBits, seqBits);

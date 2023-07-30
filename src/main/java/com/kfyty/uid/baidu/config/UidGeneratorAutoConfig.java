@@ -7,6 +7,7 @@ import com.baidu.fsg.uid.worker.WorkerIdAssigner;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 
 /**
@@ -16,6 +17,7 @@ import org.springframework.core.Ordered;
  * @date 2021/7/22 13:49
  * @email kfyty725@hotmail.com
  */
+@Configuration
 @AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE)
 public class UidGeneratorAutoConfig {
 

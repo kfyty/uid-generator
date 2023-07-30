@@ -34,18 +34,18 @@ import java.util.Objects;
 /**
  * Represents a cached implementation of {@link UidGenerator} extends
  * from {@link DefaultUidGenerator}, based on a lock free {@link RingBuffer}<p>
- * 
+ *
  * The spring properties you can specified as below:<br>
- * <li><b>boostPower:</b> RingBuffer size boost for a power of 2, Sample: boostPower is 3, it means the buffer size 
+ * <li><b>boostPower:</b> RingBuffer size boost for a power of 2, Sample: boostPower is 3, it means the buffer size
  *                        will be <code>({@link BitsAllocator#getMaxSequence()} + 1) &lt;&lt;
  *                        {@link #boostPower}</code>, Default as {@value #DEFAULT_BOOST_POWER}
- * <li><b>paddingFactor:</b> Represents a percent value of (0 - 100). When the count of rest available UIDs reach the 
+ * <li><b>paddingFactor:</b> Represents a percent value of (0 - 100). When the count of rest available UIDs reach the
  *                           threshold, it will trigger padding buffer. Default as{@link RingBuffer#DEFAULT_PADDING_PERCENT}
  *                           Sample: paddingFactor=20, bufferSize=1000 -> threshold=1000 * 20 /100, padding buffer will be triggered when tail-cursor<threshold
  * <li><b>scheduleInterval:</b> Padding buffer in a schedule, specify padding buffer interval, Unit as second
  * <li><b>rejectedPutBufferHandler:</b> Policy for rejected put buffer. Default as discard put request, just do logging
  * <li><b>rejectedTakeBufferHandler:</b> Policy for rejected take buffer. Default as throwing up an exception
- * 
+ *
  * @author yutianbao
  */
 @Slf4j
@@ -56,7 +56,7 @@ public class CachedUidGenerator extends DefaultUidGenerator {
     private int boostPower = DEFAULT_BOOST_POWER;
     private int paddingFactor = RingBuffer.DEFAULT_PADDING_PERCENT;
     private Long scheduleInterval;
-    
+
     private RejectedPutBufferHandler rejectedPutBufferHandler;
     private RejectedTakeBufferHandler rejectedTakeBufferHandler;
 
@@ -66,15 +66,16 @@ public class CachedUidGenerator extends DefaultUidGenerator {
 
     @Override
     @PostConstruct
+    @jakarta.annotation.PostConstruct
     public void afterPropertiesSet() {
         // initialize workerId & bitsAllocator
         super.afterPropertiesSet();
-        
+
         // initialize RingBuffer & RingBufferPaddingExecutor
         this.initRingBuffer();
         log.info("Initialized RingBuffer successfully.");
     }
-    
+
     @Override
     public long getUID() {
         try {
@@ -89,15 +90,16 @@ public class CachedUidGenerator extends DefaultUidGenerator {
     public String parseUID(long uid) {
         return super.parseUID(uid);
     }
-    
+
     @PreDestroy
+    @jakarta.annotation.PreDestroy
     public void destroy() {
         bufferPaddingExecutor.shutdown();
     }
 
     /**
      * Get the UIDs in the same specified second under the max sequence
-     * 
+     *
      * @param currentSecond currentSecond
      * @return UID list, size of {@link BitsAllocator#getMaxSequence()} + 1
      */
@@ -114,7 +116,7 @@ public class CachedUidGenerator extends DefaultUidGenerator {
 
         return uidList;
     }
-    
+
     /**
      * Initialize RingBuffer & RingBufferPaddingExecutor
      */
@@ -130,9 +132,9 @@ public class CachedUidGenerator extends DefaultUidGenerator {
         if (usingSchedule) {
             bufferPaddingExecutor.setScheduleInterval(scheduleInterval);
         }
-        
+
         log.info("Initialized BufferPaddingExecutor. Using schdule:{}, interval:{}", usingSchedule, scheduleInterval);
-        
+
         // set rejected put/take handle policy
         this.ringBuffer.setBufferPaddingExecutor(bufferPaddingExecutor);
         if (rejectedPutBufferHandler != null) {
@@ -141,10 +143,10 @@ public class CachedUidGenerator extends DefaultUidGenerator {
         if (rejectedTakeBufferHandler != null) {
             this.ringBuffer.setRejectedTakeHandler(rejectedTakeBufferHandler);
         }
-        
+
         // fill in all slots of the RingBuffer
         bufferPaddingExecutor.paddingBuffer();
-        
+
         // start buffer padding threads
         bufferPaddingExecutor.start();
     }
